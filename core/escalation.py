@@ -46,4 +46,14 @@ def get_escalation_message(escalation_type):
     }
 
     return messages.get(escalation_type, messages["general"])
+
+from ai.summarizer import generate_summary
+
+def create_case(messages, score):
+
+    return {
+        "messages": messages,
+        "frustration": score,
+        "summary": generate_summary(messages)
+    }
         
