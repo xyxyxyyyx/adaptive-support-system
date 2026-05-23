@@ -1,15 +1,19 @@
+from transformers import pipeline
+
+# load once (important)
+summarizer = pipeline("summarization", model="google/flan-t5-small")
+
+
 def generate_summary(messages):
-    user_msgs = [m["content"] for m in messages if m["role"] == "user"]
+    if not messages:
+        return "No conversation to summarize."
 
-    summary = "User issue summary:\n"
+    # combine chat into one text
+    text = "\n".join([f"{m['role']}: {m['content']}" for m in messages])
 
-    if any("error" in m.lower() for m in user_msgs):
-        summary += "- Error-related issue\n"
+    # safety limit (important or it crashes)
+    text = text[:2000]
 
-    if any("not working" in m.lower() for m in user_msgs):
-        summary += "- Feature malfunction\n"
+    result = summarizer(text, max_length=120, min_length=30, do_sample=False)
 
-    summary += "\nRecent messages:\n"
-    summary += "\n".join(user_msgs[-5:])
-
-    return summary
+    return result[0]["summary_text"]
