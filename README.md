@@ -2,90 +2,237 @@
 
 ## Overview
 
-This project is an MVP (Minimum Viable Product) for a customer support assistant designed to reduce conversational friction, detect user frustration signals, and manage empathetic transitions to human support team members.
+This project is an MVP (Minimum Viable Product) for a customer support assistant designed to reduce conversational friction, detect possible frustration signals, and support smoother transitions between automated support and human agents.
 
-Instead of relying heavily on expensive and unpredictable AI throughout the entire conversation, the system utilizes a **hybrid architecture** combining lightweight, rule-based heuristics for live chatting with selective AI usage solely for generating conversation summaries during a human handoff.
+Instead of continuously relying on an LLM throughout the entire conversation, the system uses a hybrid approach:
 
-The system is designed with a focus on:
+* lightweight rule-based heuristics during live interaction
+* selective AI summarization only during escalation
 
-* **Human-centered support workflows** that protect user dignity.
-* **Cost-and-time-efficient AI orchestration** (Data Minimization).
-* **Privacy-conscious design** with explicit user consent.
-* **User autonomy** in escalation decisions.
-* **Dual-fidelity handoffs** to eliminate the AI "black box" for human agents.
+The project explores how conversational systems can balance:
+
+* user experience
+* cost-efficient AI usage
+* privacy-conscious design
+* and human-in-the-loop support workflows
 
 ---
 
 ## Core Idea
 
-Traditional support systems often rely on either fully automated AI chatbots or immediate escalation to human agents. This project explores a hybrid middle-ground:
+Many customer support systems rely either on:
 
-1. **Lightweight behavioral signals** track friction locally during the conversation.
-2. **Optional, user-controlled escalation** gives the user final say.
-3. **AI-assisted summarization** triggers *only* during handoff to respect privacy and slash API costs.
+* fully automated chatbots, or
+* immediate escalation to human agents
 
-The goal is not to replace human support, but to optimize how users transition between automated assistance and human agents without making them feel digitally illiterate.
+This project explores a middle-ground approach:
+
+1. lightweight behavioral signals monitor conversational friction during interaction
+2. escalation remains optional and user-controlled
+3. AI summarization is only triggered during human handoff
+
+The goal is not to replace human support, but to reduce friction during support interactions and improve the transition between automated and human assistance.
 
 ---
 
 ## Features & System Design
 
-### 1. Rule-Based Frustration Signal Detection
+### 1. Rule-Based Friction Detection
 
-To maximize cost efficiency and data privacy, the system avoids using an LLM for real-time sentiment analysis. Instead, it tracks lightweight conversational heuristics:
+To reduce unnecessary API usage and keep the system lightweight, the project does not use an LLM for continuous real-time sentiment analysis.
 
-* Repeated or closely reworded user questions.
-* Aggressive text formatting (ALL CAPS, repeated punctuation like `!!!`).
-* Unusually long pauses or disengagement after unresolved system responses.
+Instead, it tracks simple interaction signals such as:
 
-These signals are treated as interaction patterns, not emotional ground truth, and are used to optionally offer an escalation path.
+* repeated or closely reworded questions
+* aggressive formatting (`ALL CAPS`, repeated punctuation like `!!!`)
+* unusually long pauses after unresolved responses
 
-### 2. User-Controlled Escalation & Privacy Gateways
-
-* **Granular Customer Choice:** Escalation is treated as a user choice, not a system enforcement. Users can accept or decline escalation suggestions. If declined, the state machine gracefully degrades back to standard bot automation while keeping the entry point available.
-* **Explicit Customer Consent:** User conversations remain securely inside the application backend database. They are never processed by or transmitted to third-party AI systems until the user explicitly clicks "Yes" to escalate, ensuring complete transparency.
-* **Abuse & Prompt-Injection Prevention:** The AI pipeline is protected by stateful input validation. The summarization engine cannot be invoked directly, spammed, or triggered by empty sessions; it requires an active, validated conversation history matrix before execution.
-
-### 3. Dual-Fidelity Human Handoff
-
-When escalation is requested, an LLM compresses the live chat history into a structured summary. To ensure the human agent can keep the chat moving efficiently while maintaining full data integrity, the system utilizes a **Dual-Fidelity Dashboard**:
-
-* **AI Context Summary:** Allows the agent to understand the core issue in 5 seconds so the user *never has to repeat their question*.
-* **Raw Chat Log Access:** To solve the AI "black box" problem, human agents retain instant access to unedited raw logs to ensure no critical details or subtle contexts were missed or misinterpreterted by the AI summarizer.
+These signals are treated as behavioral heuristics rather than definitive emotional interpretation.
 
 ---
 
-## 🌟 UX Spotlight: "Blameless" Copywriting for Inclusivity
+### 2. User-Controlled Escalation
 
-A core feature of this MVP is its intentional **Inclusive Communication Design**. System prompts are explicitly written to shift 100% of the technical burden onto the machine, protecting user confidence (especially for the elderly or users with low digital literacy) so they never feel "dumb."
+When potential friction signals are detected:
 
-| Trigger Context | Standard "Deflecting" Copy (Biased toward system success) | Redesigned "Blameless" Copy (Inclusive / Accessible) | Why It Works |
-| --- | --- | --- | --- |
-| **Repetition** | *"It looks like this issue might still not be resolving clearly."* | *"I'm sorry my answers haven't been as helpful as they should be. Let me connect you with one of our team members."* | Admits system failure up front so the user doesn't feel like they are asking the wrong questions. |
-| **Confusion** | *"It seems like things might be a bit unclear right now."* | *"This looks like a situation that needs a human touch to get exactly right. Let's get someone on our team to walk through this with you step-by-step."* | Replaces "things are unclear" (which implies the user is being confusing) with a positive framing: the problem simply deserves human care. |
-| **General Error** | *"It looks like this issue might need a bit more support. Would you like to talk to a human agent?"* | *"This looks like something that needs a bit more care than I can provide by myself. Would you like to talk directly with one of our friendly team members?"* | Swaps cold, clinical terms like "human agent" for warm, local language ("team members"), while positioning the handover as a feature upgrade. |
+* the system may suggest escalation to a human support agent
+* users can choose to escalate or continue chatting normally
+* escalation is never forced automatically
+
+The system is designed to keep users in control of the interaction flow.
+
+---
+
+### 3. Privacy-Conscious AI Usage
+
+User conversations are not continuously processed by external AI systems.
+
+* live chats remain within the application backend
+* AI summarization is only triggered after explicit user escalation
+* users are aware when conversation data is being prepared for human review
+
+This approach attempts to reduce unnecessary external processing of user conversations while keeping AI usage transparent.
+
+---
+
+### 4. AI-Assisted Human Handoff
+
+When escalation occurs:
+
+1. the full conversation history is preserved
+2. an LLM generates a concise support summary
+3. both the summary and raw chat logs are provided to the human support agent
+
+The summary is intended to:
+
+* reduce context recovery time for support agents
+* minimize repeated questioning
+* help conversations continue more smoothly after escalation
+
+Raw chat logs remain available to allow human agents to verify details or review additional context when needed.
+
+---
+
+### 5. Inclusive Communication Design
+
+The project also explores how support system wording may affect user experience, especially for:
+
+* elderly users
+* low digital literacy users
+* users experiencing frustration or cognitive overload
+
+System prompts are intentionally written in a supportive and non-blaming tone, focusing on system limitations rather than implying user failure.
+
+#### Example Prompt Design
+
+| Situation                    | Example Prompt                                                                                                                   |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Repeated questions           | “I'm sorry my answers haven't been as helpful as they should be. Would you like me to connect you with a team member?”         |
+| Confusion / unresolved issue | “This looks like a situation that needs a human touch to get exactly right. I can help connect you with one of our team members if you'd like.” |
+| Escalation suggestion        | “If you feel this issue would be easier with a human team member, I can help transfer the conversation.”                         |
+
+---
+
+## Architectural Considerations
+
+### Awareness of Silent Disengagement
+
+Traditional metrics such as low escalation rates do not always indicate successful support interactions.
+
+Users may stop responding due to:
+
+* confusion
+* fatigue
+* frustration
+* or disengagement
+
+Because of this, the system treats prolonged pauses and repeated unresolved questions as possible interaction signals rather than assuming silence means successful resolution.
+
+---
+
+### Human-in-the-Loop Design
+
+AI is used as a support tool rather than a final decision-maker.
+
+* rule-based logic handles lightweight interaction monitoring
+* AI is used for summarization during escalation
+* human agents remain responsible for final interpretation and resolution
+
+This project intentionally keeps humans involved in ambiguous or high-context situations.
+
+---
+
+### Cost-Efficient AI Usage
+
+Rather than sending every message through an LLM pipeline, the system limits AI usage to escalation events where summarization provides clear value.
+
+This approach helps reduce:
+
+* unnecessary API usage
+* latency overhead
+* continuous external processing of user conversations
+
+while still benefiting from AI-assisted context compression during handoff.
+
+---
+
+## State Flow Overview
+
+The system models conversational interaction as a small state-driven workflow:
+
+```mermaid
+stateDiagram-v2
+
+    [*] --> NORMAL_CONVERSATION
+
+    NORMAL_CONVERSATION --> FRICTION_DETECTED: repetition / pause / formatting signals
+
+    FRICTION_DETECTED --> ESCALATION_SUGGESTED: supportive escalation prompt
+
+    ESCALATION_SUGGESTED --> CONTINUE_CONVERSATION: user declines
+    ESCALATION_SUGGESTED --> ESCALATED_TO_HUMAN: user accepts
+
+    CONTINUE_CONVERSATION --> NORMAL_CONVERSATION
+    CONTINUE_CONVERSATION --> FRICTION_DETECTED: unresolved interaction persists
+
+    ESCALATED_TO_HUMAN --> HUMAN_SUPPORT
+```
 
 ---
 
 ## Tech Stack
 
-* **Python** (Core application logic & conditional state tracking)
-* **Streamlit** (Frontend user UI & Agent dashboard view)
-* **SQL Database** (Secure, local conversation state & history tracking)
-* **LLM API Interactivity** (Event-driven inference restricted strictly to handoff execution)
+* Python
+* Streamlit
+* SQL Database
+* LLM API (used only during escalation summarization)
+
+Core implementation includes:
+
+* rule-based conditional logic
+* conversation state tracking
+* escalation workflow management
+* AI-assisted summarization during handoff
 
 ---
 
-## Architectural & Business Principles Demonstrated
+## Limitations
 
-* **Awareness of Silent Frustration:** Traditional metrics like a "low escalation rate" can be deceptive. Users often abandon apps due to fatigue, confusion, or embarrassment. This system flags disengagement patterns rather than treating silence as customer satisfaction.
-* **Drastic TCO (Total Cost of Ownership) Reduction:** Continuously running every single chat message through an LLM for sentiment and response generation is incredibly cost-prohibitive. By using local heuristic rules for the chat and restricting the LLM purely to a single token-optimized summary at the end, API costs are reduced by an estimated 80–90%.
-* **Human-in-the-Loop Authority:** AI is used strictly as an information compression tool. It is never treated as an emotional or behavioral authority. Human agents remain responsible for final interpretation, validation, and resolution.
+* rule-based heuristics may produce false positives or false negatives
+* pause-based detection is approximate and context-dependent
+* AI summarization may omit subtle conversational nuance
+* the system currently uses simple heuristics rather than adaptive behavioral modeling
 
 ---
 
-## Limitations & Future Roadmap
+## Future Improvements
 
-* Rule-based detection may produce false positives/negatives depending on individual typing habits.
-* Pause-based signals are approximate and network-dependent, not definitive.
-* **Next Steps:** Conduct usability testing with specific elderly user cohorts to gather qualitative feedback on micro-copy and adjust adaptive escalation thresholds.
+* optional hybrid sentiment analysis layer
+* adaptive escalation thresholds
+* usability testing with different user groups
+* multilingual support
+* analytics for escalation outcomes and interaction flow patterns
+* improved personalization of support prompts
+
+---
+
+## Project Status
+
+Current project stage:
+
+* MVP / exploratory prototype
+
+Implemented:
+
+* rule-based friction detection
+* optional escalation workflow
+* AI-generated handoff summaries
+* SQL-backed conversation storage
+* Streamlit-based support interface
+
+This project primarily explores:
+
+* human-centered conversational workflows
+* lightweight behavioral signal detection
+* human-in-the-loop support systems
+* selective and cost-aware AI integration
