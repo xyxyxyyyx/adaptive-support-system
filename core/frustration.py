@@ -4,8 +4,7 @@ WEIGHTS = {
     "caps": 2,
     "punctuation": 1,
     "repetition": 3,
-    "inactivity": 2,
-    "spam_penalty": -3
+    "inactivity": 1,
 }
 
 def calculate_frustration(user_input, previous_messages):
@@ -15,7 +14,9 @@ def calculate_frustration(user_input, previous_messages):
     # -------------------------
     # SIGNAL 1: CAPS LOCK
     # -------------------------
-    if user_input.isupper():
+    letters = [c for c in user_input if c.isalpha()]
+
+    if len(letters) >= 4 and user_input.isupper():
         score += WEIGHTS["caps"]
 
     # -------------------------
@@ -29,36 +30,14 @@ def calculate_frustration(user_input, previous_messages):
     # -------------------------
     score += repetition_score(user_input, previous_messages)
 
-    # -------------------------
-    # SIGNAL 4: Spam detection
-    # -------------------------
-    if is_spam(user_input):
-        score += WEIGHTS["spam_penalty"]
 
     # -------------------------
-    # SIGNAL 5: Inactivity (contextual)
+    # SIGNAL 4: Inactivity (contextual)
     # -------------------------
     score += inactivity_score(previous_messages)
 
     return score
 
-
-def is_spam(text):
-
-    # too many symbols
-    symbol_count = len(re.findall(r'[^a-zA-Z0-9\s]', text))
-
-    if len(text) > 0:
-        symbol_ratio = symbol_count / len(text)
-
-        if symbol_ratio > 0.6:
-            return True
-
-    # random keyboard smash
-    if len(text.split()) == 1 and len(text) > 12:
-        return True
-
-    return False
 
 # Repetition detection
 def repetition_score(user_input, previous_messages):
@@ -100,6 +79,6 @@ def inactivity_score(previous_messages, threshold_seconds=60):
             delay = time.time() - last_time
 
             if delay > threshold_seconds:
-                return 2
+                return WEIGHTS["inactivity"]
             
     return 0

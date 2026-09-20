@@ -1,20 +1,22 @@
 import streamlit as st
-from ai.summarizer import generate_summary
+
+from data.database import init_db, get_latest_case
+
+init_db()
 
 st.title("Agent Dashboard")
 
-# fake example data (later from database)
-case = {
-    "messages": [],
-    "frustration": 7
-}
+case = get_latest_case()
 
-st.subheader("Frustration Score")
-st.write(case["frustration"])
+if case is None:
+    st.info("No escalated cases available yet.")
 
-st.subheader("AI Summary")
-st.write(generate_summary(case["messages"]))
+else:
+    st.subheader("Frustration Score")
+    st.write(case["frustration"])
 
-st.subheader("Full Chat")
-for m in case["messages"]:
-    st.write(f"{m['role']}: {m['content']}")
+    st.subheader("AI Summary")
+    st.write(case["summary"])
+
+    st.subheader("Full Chat")
+    st.text(case["raw_chat"])

@@ -24,25 +24,25 @@ def classify_escalation_type(user_input, previous_messages):
 
 def get_escalation_message(escalation_type):
     messages = {
-        "repetition": (
-            "It looks like this issue might still not be resolving clearly. "
-            "Would you like me to connect you with a human support agent who can take a closer look?"
-        ),
+    "repetition": (
+        "I'm sorry my answers haven't been as helpful as they should be. "
+        "If you'd like, I can connect you with one of our team members who can listen and get this sorted out for you right away."
+    ),
 
-        "urgency": (
-            "I want to make sure you get the help you need as quickly as possible. "
-            "Would you like to speak with a human support representative?"
-        ),
+    "urgency": (
+        "Your time is important, and I want to make sure we fix this for you quickly. "
+        "Would you like me to hand you over to someone on our team who can help you right now?"
+    ),
 
-        "confusion": (
-             "It seems like things might be a bit unclear right now. "
-            "I can connect you with someone who can walk through this with you step by step."
-        ),
+    "confusion": (
+        "This looks like a situation that needs a human touch to get exactly right. "
+        "I can help connect you with one of our team members if you'd like."
+    ),
 
-        "general": (
-            "It looks like this issue might need a bit more support. "
-            "Would you like to talk to a human agent?"
-        )
+    "general": (
+        "This looks like something that needs a bit more care than I can provide by myself. "
+        "Would you like to talk directly with one of our friendly team members?"
+    )
     }
 
     return messages.get(escalation_type, messages["general"])
@@ -56,4 +56,16 @@ def create_case(messages, score):
         "frustration": score,
         "summary": generate_summary(messages)
     }
+
+def requests_human_support(user_input):
+    text = user_input.lower()
+
+    trigger_phrases = [
+        "contact human support",
+        "human support",
+        "talk to a human",
+        "speak to a human"
+    ]
+
+    return any(phrase in text for phrase in trigger_phrases)
         
